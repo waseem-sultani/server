@@ -1,19 +1,18 @@
-import type { IUserBody } from "../../utils/interfaces/user/index.js";
-import userSchema from "../../schemas/user/user.schema.js";
-
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import User from "../../schemas/user/user.schema.js";
+import type { IUserBody } from "../../interfaces/index.js";
 
 const handleSignup = async (data: IUserBody) => {
   try {
     const { name, email, password } = data;
-    const userFound = await userSchema.findOne({ email: email });
+    const userFound = await User.findOne({ email: email });
     if (userFound) {
       return { status: false, message: "user is already created" };
     }
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await userSchema.create({
+    await User.create({
       name: name,
       email: email,
       password: hashedPassword,
@@ -28,29 +27,42 @@ const handleSignup = async (data: IUserBody) => {
 const handleLogin = async (data: IUserBody) => {
   try {
     const { email, password } = data;
-    const user = await userSchema.findOne({ email: email });
+    const user = await User.findOne({ email: email });
     if (!user) {
-      return { status: false, message: "No user with this email." };
+      return {
+        status: false,
+        reason: "email",
+        message: "No user with this email.",
+      };
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return { status: false, message: "Password is incorrect." };
+      return {
+        status: false,
+        reason: "password",
+        message: "Password is incorrect.",
+      };
     }
 
     const token = jwt.sign(
       { id: user._id, email: user.email },
       process.env.JWT_SECRET!,
       {
-        expiresIn: "1h",
+        expiresIn: "50d",
       }
     );
 
-    return token;
+    return { status: true, token, user };
   } catch (error) {
     console.log(error);
     throw error;
   }
 };
 
-export default { handleSignup, handleLogin };
+const getAllUsers = async () => {
+  const users = await User.find().select("-password");
+  return users;
+};
+
+export default { handleSignup, handleLogin, getAllUsers };
