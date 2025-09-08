@@ -17,6 +17,7 @@ const issuesSchema = new mongoose.Schema(
     assignee: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      index: true,
       default: null,
     },
     tags: { type: [String], default: [] },
@@ -24,6 +25,7 @@ const issuesSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
   },
   { timestamps: true }
