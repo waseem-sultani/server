@@ -60,7 +60,7 @@ const getAllAssignedIssues = async (user: any, page: number, limit: number) => {
     const skip = (page - 1) * limit;
 
     const issues = await Issue.find({ assignee: user?.id })
-      .populate("assignee", "name")
+      .populate("userId", "name")
       .skip(skip)
       .limit(limit);
 
