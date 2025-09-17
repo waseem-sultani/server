@@ -12,7 +12,7 @@ const createIssue = async (data: IIsue, user: any) => {
       description,
       status,
       priority,
-      assignee: assignee === "" ? null : assignee,
+      assignee: assignee ? assignee : null,
       tags,
       userId: id,
     });
