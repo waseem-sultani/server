@@ -60,8 +60,9 @@ const handleLogin = async (data: IUserBody) => {
   }
 };
 
-const getAllUsers = async () => {
-  const users = await User.find().select("-password");
+const getAllUsers = async (id: string) => {
+  console.log("userId:", id);
+  const users = await User.find({ _id: { $ne: id } }).select("-password");
   return users;
 };
 

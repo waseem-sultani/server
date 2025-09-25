@@ -13,7 +13,6 @@ const { handleSignup, handleLogin, getAllUsers } = UserService;
 User.post("/signup", async (req: Request, res: Response) => {
   try {
     const data = req.body;
-    console.log("Data:", data);
     const response = await handleSignup(data);
     res.json(response);
   } catch (error) {
@@ -25,8 +24,6 @@ User.post("/signup", async (req: Request, res: Response) => {
 User.post("/login", async (req: Request, res: Response) => {
   try {
     const data = req.body;
-    console.log("Data:", data);
-
     const result = await handleLogin(data);
 
     if (result.status === false) {
@@ -70,8 +67,9 @@ User.post("/logout", (req: Request, res: Response) => {
   return res.json({ message: "Logged out successfully" });
 });
 
-User.get("/get-users", async (req: Request, res: Response) => {
-  const users = await getAllUsers();
+User.get("/get-users", authMiddleware, async (req: Request, res: Response) => {
+  const { id } = (req as any).user;
+  const users = await getAllUsers(id);
 
   return res.json({ users });
 });
